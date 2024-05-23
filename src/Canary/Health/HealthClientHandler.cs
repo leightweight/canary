@@ -30,17 +30,38 @@ internal class HealthClientHandler(
             return WriteNotFoundAsync();
 
         if (path == "/")
-            return WriteResponseAsync(200, new { Protocols = context.BirdProtocols });
+            return HandleIndexAsync();
 
         if (!path.StartsWith("/protocol/"))
             return WriteNotFoundAsync();
 
-        var split = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        if (split.Length != 2)
-            return WriteNotFoundAsync();
+        return path.Split('/', StringSplitOptions.RemoveEmptyEntries) is { Length: 2 } split
+            ? HandleProtocolAsync(split[1])
+            : WriteNotFoundAsync();
+    }
 
+    private Task HandleIndexAsync()
+    {
+        return WriteResponseAsync(
+            200,
+            new
+            {
+                Metadata = new
+                {
+                    ServerIp = httpContext.Request.LocalEndPoint.Address.ToString(),
+                    ServerPort = httpContext.Request.LocalEndPoint.Port,
+                    ClientIp = httpContext.Request.RemoteEndPoint.Address.ToString(),
+                    ClientPort = httpContext.Request.RemoteEndPoint.Port
+                },
+                Protocols = context.BirdProtocols
+            });
+    }
+
+    private Task HandleProtocolAsync(
+        string name)
+    {
         var protocol = context.BirdProtocols
-            .Find(p => p.Name == split[1]);
+            .Find(p => p.Name == name);
         if (protocol is null)
             return WriteNotFoundAsync();
 
