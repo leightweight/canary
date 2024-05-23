@@ -5,6 +5,7 @@ Before=tailscaled.service
 
 [Service]
 Type=exec
+WorkingDirectory=/var/run
 ExecStart=/usr/sbin/canary
 Restart=always
 

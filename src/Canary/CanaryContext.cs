@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
@@ -36,7 +37,7 @@ internal sealed class CanaryContext : IDisposable, IAsyncDisposable
     {
         var birdSocketPath = args.Length >= 1
             ? args[0]
-            : "/var/run/canary.ctl";
+            : Path.Join(Directory.GetCurrentDirectory(), "canary.ctl");
 
         var healthEndpoint = args.Length >= 2
             ? $"{args[1].TrimEnd('/')}/"
