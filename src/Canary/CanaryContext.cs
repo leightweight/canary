@@ -35,13 +35,13 @@ internal sealed class CanaryContext : IDisposable, IAsyncDisposable
         string[] args,
         CancellationToken stoppingToken)
     {
-        var birdSocketPath = args.Length >= 1
-            ? args[0]
-            : Path.Join(Directory.GetCurrentDirectory(), "canary.ctl");
+        var healthEndpoint = args.Length >= 1
+            ? $"http://+:{args[0]}/"
+            : "http://+:80/";
 
-        var healthEndpoint = args.Length >= 2
-            ? $"{args[1].TrimEnd('/')}/"
-            : "http://+:8080/";
+        var birdSocketPath = args.Length >= 2
+            ? args[1]
+            : Path.Join(Directory.GetCurrentDirectory(), "canary.ctl");
 
         return new CanaryContext(
             birdSocketPath,
